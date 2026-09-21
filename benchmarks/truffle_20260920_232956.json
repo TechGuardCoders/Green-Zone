@@ -1,0 +1,68 @@
+{
+  "when": "2026-09-20 23:27:32",
+  "windows": [
+    {
+      "concurrency": 1,
+      "requests": 16,
+      "ok": 16,
+      "failed": 0,
+      "wall_s": 67.58,
+      "completion_tokens": 1390,
+      "agg_tok_s": 20.6,
+      "drafted_delta": 4522.0,
+      "accepted_delta": 1018.0,
+      "acceptance_rate": 0.2251,
+      "accept_ratio_per_draft": 1.576,
+      "per_pos_decay": {
+        "1": 0.597,
+        "2": 0.333,
+        "3": 0.204,
+        "4": 0.133,
+        "5": 0.082,
+        "6": 0.035
+      }
+    },
+    {
+      "concurrency": 2,
+      "requests": 16,
+      "ok": 16,
+      "failed": 0,
+      "wall_s": 45.44,
+      "completion_tokens": 1370,
+      "agg_tok_s": 30.2,
+      "drafted_delta": 3899.0,
+      "accepted_delta": 817.0,
+      "acceptance_rate": 0.2095,
+      "accept_ratio_per_draft": 1.467,
+      "per_pos_decay": {
+        "1": 0.552,
+        "2": 0.309,
+        "3": 0.183,
+        "4": 0.09,
+        "5": 0.057,
+        "6": 0.041
+      }
+    },
+    {
+      "concurrency": 4,
+      "requests": 16,
+      "ok": 16,
+      "failed": 0,
+      "wall_s": 31.03,
+      "completion_tokens": 1325,
+      "agg_tok_s": 42.7,
+      "drafted_delta": 3633.0,
+      "accepted_delta": 811.0,
+      "acceptance_rate": 0.2232,
+      "accept_ratio_per_draft": 1.563,
+      "per_pos_decay": {
+        "1": 0.608,
+        "2": 0.324,
+        "3": 0.185,
+        "4": 0.102,
+        "5": 0.057,
+        "6": 0.028
+      }
+    }
+  ]
+}
