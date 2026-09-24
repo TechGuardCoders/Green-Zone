@@ -1,14 +1,14 @@
-"""Offline tests for Truffle logic - no network."""
+"""Offline tests for Green-Zone logic - no network."""
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from truffle import get_spec_counters  # noqa: E402  (import validates module)
+from green_zone import get_spec_counters  # noqa: E402  (import validates module)
 
 
 def test_module_imports():
-    import truffle
-    assert hasattr(truffle, "measure") and hasattr(truffle, "get_spec_counters")
+    import green_zone
+    assert hasattr(green_zone, "measure") and hasattr(green_zone, "get_spec_counters")
 
 
 def test_per_pos_decay_math():

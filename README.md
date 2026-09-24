@@ -1,10 +1,10 @@
-# Truffle
+# Green-Zone
 
-**Speculative decoding teardown — the draft model is the truffle pig (cheap, fast, sniffs candidates); the target model is the chef (expensive, verifies, accepts only the good ones).**
+**Speculative decoding teardown — the draft model is the green_zone pig (cheap, fast, sniffs candidates); the target model is the chef (expensive, verifies, accepts only the good ones).**
 
 Measured against the live [spark-glm-cluster](https://github.com/TechGuardCoders/spark-glm-cluster) (GLM-5.3-Flash EXL3, DFlash2 speculation), entirely read-only: acceptance counters from `/metrics` deltas, no cluster mutation.
 
-Part of the [TechGuardCoders portfolio](https://github.com/orgs/TechGuardCoders/repositories): Cost Peep → Batcher → Spinal → Ball Knowledge → Bastion → Furnace → **Truffle** → …
+Part of the [TechGuardCoders portfolio](https://github.com/orgs/TechGuardCoders/repositories): Cost Peep → Batcher → Spinal → Ball Knowledge → Bastion → Furnace → **Green-Zone** → …
 
 ## Measured (live, 48 requests, 0 failures)
 
@@ -28,7 +28,7 @@ Textbook geometric decay: each draft position is accepted ~60% as often as the o
 ## What the numbers mean
 
 1. **~1.56 accepted tokens per draft cycle** — each draft round costs one target-model verification pass but yields ~1.5 tokens of output. Without speculation the ratio is exactly 1.0; this is the spec-decode dividend.
-2. **Acceptance is concurrency-INSENSITIVE (~21-22%)** — acceptance is a property of draft/target agreement, not load. This is why Batcher's knee at c=2 exists: spec overhead is fixed, so its *benefit* shrinks in relative terms as bandwidth-bound MoE batching takes over. Truffle explains Batcher's knee from the inside.
+2. **Acceptance is concurrency-INSENSITIVE (~21-22%)** — acceptance is a property of draft/target agreement, not load. This is why Batcher's knee at c=2 exists: spec overhead is fixed, so its *benefit* shrinks in relative terms as bandwidth-bound MoE batching takes over. Green-Zone explains Batcher's knee from the inside.
 3. **Draft length has a hard sweet spot.** With geometric decay ~0.6, a draft chain of K has expected accepted = 1/(1−0.6·(K−1)/K)-ish — drafting beyond position 3-4 is wasted pig-work that still costs draft-model compute and verification latency.
 
 ## Cost per accepted token
@@ -38,7 +38,7 @@ Rejected draft tokens are compute you paid for and threw away. With 78% rejectio
 ## Run it
 
 ```bash
-VLLM_API_KEY=<key> python truffle.py --requests 16 --max-tokens 100
+VLLM_API_KEY=<key> python green_zone.py --requests 16 --max-tokens 100
 # read-only: chat completions + /metrics scrapes, nothing else
 ```
 

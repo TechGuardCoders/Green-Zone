@@ -12,4 +12,4 @@ jobs:
       - run: pip install pytest
       - run: python -m pytest tests/ -q
       - name: smoke — module contract (no live cluster in CI)
-        run: python -c "import truffle; assert callable(truffle.measure)"
+        run: python -c "import green_zone; assert callable(green_zone.measure)"

@@ -1,7 +1,7 @@
 """
-Truffle - speculative decoding teardown.
+Green-Zone - speculative decoding teardown.
 
-The draft model is the truffle pig: cheap, fast, sniffs out candidate tokens.
+The draft model is the green_zone pig: cheap, fast, sniffs out candidate tokens.
 The target model is the chef: expensive, verifies, accepts only the good ones.
 Accepted-token rate is the ratio that decides whether the whole scheme pays.
 
@@ -115,7 +115,7 @@ def main():
     ap.add_argument("--out", default="benchmarks")
     args = ap.parse_args()
 
-    print(f"Truffle: measuring speculative decoding acceptance on {MODEL}")
+    print(f"Green-Zone: measuring speculative decoding acceptance on {MODEL}")
     print("(draft=pig, target=chef - read-only against the live cluster)\n")
 
     run = {"when": time.strftime("%Y-%m-%d %H:%M:%S"), "windows": []}
@@ -128,7 +128,7 @@ def main():
 
     out = Path(args.out)
     out.mkdir(exist_ok=True)
-    path = out / f"truffle_{time.strftime('%Y%m%d_%H%M%S')}.json"
+    path = out / f"green_zone_{time.strftime('%Y%m%d_%H%M%S')}.json"
     path.write_text(json.dumps(run, indent=2))
     print(f"\nsaved {path}")
 
