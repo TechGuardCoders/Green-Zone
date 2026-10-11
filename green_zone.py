@@ -22,7 +22,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-BASE = os.environ.get("VLLM_BASE_URL", "http://192.168.0.182:8000")
+BASE = os.environ.get("VLLM_BASE_URL", "http://localhost:8000")
 KEY = os.environ.get("VLLM_API_KEY")
 MODEL = os.environ.get("VLLM_MODEL", "glm-5.3-flash")
 
