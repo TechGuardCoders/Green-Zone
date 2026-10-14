@@ -26,6 +26,25 @@ BASE = os.environ.get("VLLM_BASE_URL", "http://localhost:8000")
 KEY = os.environ.get("VLLM_API_KEY")
 MODEL = os.environ.get("VLLM_MODEL", "glm-5.3-flash")
 
+# Fleet: named serving nodes. Default (no --node) keeps the single-node
+# behavior exactly as before. Only /metrics is ever touched - read-only.
+FLEET_NODES = {
+    "glm-head": "http://192.168.0.182:8000",
+    "tensorfold": "http://192.168.0.157:8421",
+    "bonsai-1": "http://192.168.0.10:8422",
+    "bonsai-2": "http://192.168.0.144:8422",
+    "sushi": "http://192.168.0.11:8450",
+}
+
+
+def resolve_base(node: str | None) -> str:
+    """Map a fleet node name to its base URL. None -> default single-node BASE."""
+    if node is None:
+        return BASE
+    if node not in FLEET_NODES:
+        raise SystemExit(f"unknown node {node!r}; known: {', '.join(sorted(FLEET_NODES))}")
+    return FLEET_NODES[node]
+
 PROMPTS = [
     "Summarize the trade-offs of speculative decoding in two sentences.",
     "Write one paragraph explaining KV cache pressure to an SRE.",
@@ -38,9 +57,10 @@ PROMPTS = [
 ]
 
 
-def get_spec_counters() -> dict:
+def get_spec_counters(base: str | None = None) -> dict:
     """Scrape spec-decode counters. Returns drafted/accepted/per-position."""
-    with urllib.request.urlopen(BASE + "/metrics", timeout=10) as r:
+    url = (base or BASE) + "/metrics"
+    with urllib.request.urlopen(url, timeout=10) as r:
         text = r.read().decode()
     counters = {"drafted": 0.0, "accepted": 0.0, "drafts": 0.0, "per_pos": {}}
     for line in text.splitlines():
@@ -108,12 +128,38 @@ def measure(concurrency: int, requests: int, max_tokens: int) -> dict:
     }
 
 
+def snapshot_node(node: str) -> dict:
+    """Fleet mode: read-only metrics snapshot from one named node. No /v1 calls."""
+    base = resolve_base(node)
+    c = get_spec_counters(base)
+    rate = c["accepted"] / c["drafted"] if c["drafted"] > 0 else None
+    return {"node": node, "base": base, "drafted": c["drafted"],
+            "accepted": c["accepted"], "drafts": c["drafts"],
+            "cumulative_acceptance_rate": round(rate, 4) if rate is not None else None,
+            "per_pos_positions": sorted(c["per_pos"])}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--requests", type=int, default=16)
     ap.add_argument("--max-tokens", type=int, default=100)
     ap.add_argument("--out", default="benchmarks")
+    ap.add_argument("--node", default=None,
+                    help=f"fleet node to benchmark (one of: {', '.join(sorted(FLEET_NODES))}); "
+                         f"with --metrics-only scrapes only /metrics (read-only)")
+    ap.add_argument("--metrics-only", action="store_true",
+                    help="snapshot the node's /metrics counters and exit (no /v1 traffic)")
     args = ap.parse_args()
+
+    if args.metrics_only:
+        snap = snapshot_node(args.node) if args.node else {"node": "default", **get_spec_counters()}
+        print(json.dumps(snap, indent=2))
+        out = Path(args.out)
+        out.mkdir(exist_ok=True)
+        path = out / f"green_zone_snapshot_{time.strftime('%Y%m%d_%H%M%S')}.json"
+        path.write_text(json.dumps(snap, indent=2))
+        print(f"saved {path}")
+        return
 
     print(f"Green-Zone: measuring speculative decoding acceptance on {MODEL}")
     print("(draft=pig, target=chef - read-only against the live cluster)\n")

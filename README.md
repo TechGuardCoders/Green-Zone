@@ -45,3 +45,11 @@ VLLM_API_KEY=<key> python green_zone.py --requests 16 --max-tokens 100
 ## Tests
 
 3 offline tests (decay math, zero-draft guard, module contract). CI-safe.
+
+## Fleet: benchmark any node
+
+`--node NAME` targets a named fleet node; with `--metrics-only` it scrapes only that node's `/metrics` (read-only, no `/v1` traffic) and saves a snapshot. Nodes: `glm-head`, `tensorfold`, `bonsai-1`, `bonsai-2`, `sushi`. No `--node` keeps the original single-node behavior.
+
+```bash
+python green_zone.py --node tensorfold --metrics-only
+```
