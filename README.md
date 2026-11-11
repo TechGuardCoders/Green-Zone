@@ -53,3 +53,18 @@ VLLM_API_KEY=<key> python green_zone.py --requests 16 --max-tokens 100
 ```bash
 python green_zone.py --node tensorfold --metrics-only
 ```
+
+## Docker
+
+Multi-stage, multi-arch image (amd64 + arm64), runs as non-root.
+
+```bash
+# Build for your local arch
+docker build -t green-zone .
+
+# Build for both arches with buildx
+docker buildx build --platform linux/amd64,linux/arm64 -t green-zone .
+
+# Run
+docker run --rm -e VLLM_BASE_URL=http://host.docker.internal:8000 green-zone
+```
